@@ -5,7 +5,7 @@ function AdminLogin() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    const response = await fetch("http://localhost:8080/admin/login", {
+    const response = await fetch(`${process.env.REACT_APP_ADMINLOGIN_API_URL}/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
