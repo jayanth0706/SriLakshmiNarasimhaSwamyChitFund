@@ -42,7 +42,8 @@ function AdminLogin() {
     const data = await response.text();
 
     if (response.ok) {
-      navigate("/dashboard");   // ← success → go to dashboard
+      sessionStorage.setItem("isLoggedIn", "true"); 
+      navigate("/dashboard");  // ← success → go to dashboard
     } else {
       alert(data);              // ← failure → show error message
     }

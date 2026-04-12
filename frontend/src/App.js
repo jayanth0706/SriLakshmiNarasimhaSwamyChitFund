@@ -7,10 +7,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Default → always start at Login */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );
