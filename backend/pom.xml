@@ -46,11 +46,22 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Spring Data JPA — fixes JpaRepository red underline -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<!-- SQL LITE DEPENDENCY -->
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.45.1.0</version>
+		</dependency>
+		<!-- Hibernate SQLite dialect -->
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-community-dialects</artifactId>
+			<version>6.4.4.Final</version>
 		</dependency>
 
 	</dependencies>

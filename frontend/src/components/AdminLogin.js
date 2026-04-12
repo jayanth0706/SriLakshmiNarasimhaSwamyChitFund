@@ -1,6 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AdminLogin() {
+
+  const navigate = useNavigate();
+
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +40,12 @@ function AdminLogin() {
       }
     );
     const data = await response.text();
-    alert(data);
+
+    if (response.ok) {
+      navigate("/dashboard");   // ← success → go to dashboard
+    } else {
+      alert(data);              // ← failure → show error message
+    }
   };
 
   const handleKeyPress = (e) => {
