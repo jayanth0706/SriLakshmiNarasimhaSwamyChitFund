@@ -233,7 +233,7 @@ export default function AdminDashboard() {
         <div style={S.navBrand}><span style={S.brandDot}/>ChitAdmin</div>
         <div style={S.navRight}>
           <button style={S.btnOutline} onClick={() => navigate("/profile")}>Profile</button>
-          <button onClick={() => {
+          <button style={S.btnGreen} onClick={() => {
             sessionStorage.removeItem("isLoggedIn");
             navigate("/login");
           }}>Logout</button>
