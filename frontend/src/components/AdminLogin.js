@@ -32,7 +32,7 @@ function AdminLogin() {
     if (passwordError) return alert(passwordError);
 
     const response = await fetch(
-      `${process.env.REACT_APP_ADMINLOGIN_API_URL}/admin/login`,
+      `${process.env.REACT_APP_API_URL}/admin/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

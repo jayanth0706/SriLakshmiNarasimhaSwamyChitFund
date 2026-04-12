@@ -64,18 +64,22 @@ public class ChitPlanController {
         return ResponseEntity.ok(chitPlanRepository.findAll());
     }
 
+    // ── GET /admin/chit-plans-details/{id} ────────────────────────────────
+    @GetMapping("/chit-plans-details/{id}")
+    public ResponseEntity<?> getChitPlanById(@PathVariable Long id) {
+        return chitPlanRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // ── DELETE /admin/chit-plans/{id} ─────────────────────────────────────
-    // Also deletes all members linked to this plan (cascade via repository)
     @DeleteMapping("/chit-plans/{id}")
     @Transactional
     public ResponseEntity<String> deleteChitPlan(@PathVariable Long id) {
         if (!chitPlanRepository.existsById(id))
             return ResponseEntity.notFound().build();
 
-        // Delete all members of this plan first
         chitMemberRepository.deleteByChitPlanId(id);
-
-        // Then delete the plan itself
         chitPlanRepository.deleteById(id);
 
         return ResponseEntity.ok("Chit plan and its members deleted successfully.");
