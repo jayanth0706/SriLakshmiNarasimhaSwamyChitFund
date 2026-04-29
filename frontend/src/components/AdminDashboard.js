@@ -12,7 +12,7 @@ const G_LIGHT = "#f0fdf4";
 const G_BORDER = "#bbf7d0";
 const RED = "#ef4444";
 const FONT = "'Outfit', sans-serif";
-const BASE = `${process.env.REACT_APP_API_URL}/admin/dashboard`;
+const BASE = `${process.env.REACT_APP_API_URL}/admin`;
 
 const S = {
   root: { fontFamily: FONT, minHeight: "100vh", background: "#f4f6f4", display: "flex", flexDirection: "column" },
