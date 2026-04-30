@@ -7,7 +7,7 @@ import java.sql.*;
 @Service
 public class AdminService {
 
-    private static final String DB_URL = "jdbc:sqlite:/app/chitfund.db";
+    private static final String DB_URL = "jdbc:sqlite:/app/admin.db";
 
     @PostConstruct
     public void initDatabase() {
