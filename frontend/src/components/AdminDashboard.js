@@ -13,14 +13,11 @@ const RED = "#ef4444";
 const BLUE = "#2563eb";
 const BLUE_LIGHT = "#eff6ff";
 const BLUE_BORDER = "#bfdbfe";
-const AMBER = "#d97706";
-const AMBER_LIGHT = "#fffbeb";
-const AMBER_BORDER = "#fde68a";
 const GRAY = "#6b7280";
 const GRAY_LIGHT = "#f9fafb";
 const GRAY_BORDER = "#e5e7eb";
 const FONT = "'Outfit', sans-serif";
-const BASE = "${process.env.REACT_APP_API_URL}/admin";
+const BASE = "https://srilakshminarasimhaswamychitfund.onrender.com/admin";
 
 const S = {
   root: { fontFamily: FONT, minHeight: "100vh", background: "#f4f6f4", display: "flex", flexDirection: "column" },
