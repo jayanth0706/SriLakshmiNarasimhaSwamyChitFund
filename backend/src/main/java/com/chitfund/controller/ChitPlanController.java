@@ -84,4 +84,37 @@ public class ChitPlanController {
 
         return ResponseEntity.ok("Chit plan and its members deleted successfully.");
     }
+    // ── PUT /admin/chit-plans/{id} ─────────────────────────────────────────────
+    @PutMapping("/chit-plans/{id}")
+    public ResponseEntity<String> updateChitPlan(@PathVariable Long id, @RequestBody ChitPlan chitPlan) {
+        if (!chitPlanRepository.existsById(id))
+            return ResponseEntity.notFound().build();
+
+        if (chitPlan.getChitPlanName() == null || chitPlan.getChitPlanName().isBlank())
+            return ResponseEntity.badRequest().body("Chit plan name is required.");
+        if (chitPlan.getChitPlanName().length() > 50)
+            return ResponseEntity.badRequest().body("Chit plan name must be 50 characters or less.");
+        if (chitPlan.getTotalAmount() == null)
+            return ResponseEntity.badRequest().body("Total amount is required.");
+        if (chitPlan.getMonthlyPay() == null)
+            return ResponseEntity.badRequest().body("Monthly pay is required.");
+        if (chitPlan.getTotalMonths() == null)
+            return ResponseEntity.badRequest().body("Total months is required.");
+        if (chitPlan.getStartDate() == null || chitPlan.getStartDate().isBlank())
+            return ResponseEntity.badRequest().body("Start date is required.");
+        if (chitPlan.getEndDate() == null || chitPlan.getEndDate().isBlank())
+            return ResponseEntity.badRequest().body("End date is required.");
+        if (chitPlan.getEndDate().compareTo(chitPlan.getStartDate()) <= 0)
+            return ResponseEntity.badRequest().body("End date must be after start date.");
+        if (chitPlan.getAdminName() == null || chitPlan.getAdminName().isBlank())
+            return ResponseEntity.badRequest().body("Admin name is required.");
+        if (!chitPlan.getAdminName().matches("[a-zA-Z ]+"))
+            return ResponseEntity.badRequest().body("Admin name must contain letters only.");
+        if (chitPlan.getAdminContact() == null || !chitPlan.getAdminContact().matches("\\d{10}"))
+            return ResponseEntity.badRequest().body("Admin contact must be exactly 10 digits.");
+
+        chitPlan.setId(id);
+        chitPlanRepository.save(chitPlan);
+        return ResponseEntity.ok("Chit plan updated successfully.");
+    }
 }
