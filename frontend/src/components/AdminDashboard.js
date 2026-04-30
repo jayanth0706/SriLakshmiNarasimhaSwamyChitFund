@@ -17,7 +17,7 @@ const GRAY = "#6b7280";
 const GRAY_LIGHT = "#f9fafb";
 const GRAY_BORDER = "#e5e7eb";
 const FONT = "'Outfit', sans-serif";
-const BASE = "${process.env.REACT_APP_API_URL}/admin";
+const BASE = `${process.env.REACT_APP_API_URL}/admin`;
 
 const S = {
   root: { fontFamily: FONT, minHeight: "100vh", background: "#f4f6f4", display: "flex", flexDirection: "column" },
