@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function AdminLogin() {
 
   const navigate = useNavigate();
-
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,11 +26,13 @@ function AdminLogin() {
   };
 
   const handleLogin = async () => {
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-    if (emailError) return alert(emailError);
-    if (passwordError) return alert(passwordError);
+  const emailError = validateEmail(email);
+  const passwordError = validatePassword(password);
+  if (emailError) return alert(emailError);
+  if (passwordError) return alert(passwordError);
 
+  setLoggingIn(true);  // ← ADD
+  try {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/admin/login`,
       {
@@ -40,14 +42,16 @@ function AdminLogin() {
       }
     );
     const data = await response.text();
-
     if (response.ok) {
-      sessionStorage.setItem("isLoggedIn", "true"); 
-      navigate("/dashboard");  // ← success → go to dashboard
+      sessionStorage.setItem("isLoggedIn", "true");
+      navigate("/dashboard");
     } else {
-      alert(data);              // ← failure → show error message
+      alert(data);
     }
-  };
+  } finally {
+    setLoggingIn(false);  // ← ADD
+  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && email && password) handleLogin();
@@ -359,13 +363,13 @@ function AdminLogin() {
                 <button
                   className="login-btn"
                   style={{
-                    backgroundColor: isFormValid ? "green" : "#aaa",
-                    cursor: isFormValid ? "pointer" : "not-allowed",
+                    backgroundColor: isFormValid && !loggingIn ? "green" : "#aaa",
+                    cursor: isFormValid && !loggingIn ? "pointer" : "not-allowed",
                   }}
                   onClick={handleLogin}
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || loggingIn}
                 >
-                  Login
+                  {loggingIn ? "Connecting… (may take ~30s)" : "Login"}
                 </button>
               </div>
 
