@@ -369,7 +369,7 @@ function AdminLogin() {
                   onClick={handleLogin}
                   disabled={!isFormValid || loggingIn}
                 >
-                  {loggingIn ? "Connecting… (may take ~30s)" : "Login"}
+                  {loggingIn ? "Connecting…" : "Login"}
                 </button>
               </div>
 
