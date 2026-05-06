@@ -26,6 +26,9 @@ public class ChitMember {
     @Column(name = "member_address", length = 200)
     private String memberAddress;
 
+    @Column(name = "winning_month", length = 50)
+    private String winningMonth;
+
     // ── Getters & Setters ──────────────────────────────────────
     public Long getId()                          { return id; }
     public void setId(Long id)                   { this.id = id; }
@@ -44,4 +47,7 @@ public class ChitMember {
 
     public String getMemberAddress()                     { return memberAddress; }
     public void   setMemberAddress(String memberAddress) { this.memberAddress = memberAddress; }
+
+    public String getWinningMonth()                      { return winningMonth; }
+    public void   setWinningMonth(String winningMonth)   { this.winningMonth = winningMonth; }
 }

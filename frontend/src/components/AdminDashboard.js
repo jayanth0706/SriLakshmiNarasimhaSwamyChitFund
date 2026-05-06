@@ -30,6 +30,7 @@ const S = {
   body: { flex: 1, padding: "36px 40px 120px" },
   pageHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" },
   pageTitle: { fontWeight: 800, fontSize: "22px", color: "#0a0a0a" },
+  cardClickable: { cursor: "pointer", transition: "transform 0.12s, box-shadow 0.12s" },
 
   // Section styles
   section: { marginBottom: "40px" },
@@ -352,17 +353,33 @@ export default function AdminDashboard() {
   plans.forEach(p => { grouped[classifyPlan(p)].push(p); });
 
   const renderCard = (p, sec) => (
-    <div key={p.id} style={S.card}>
-      {/* Top accent bar */}
+    <div
+      key={p.id}
+      style={{
+        ...S.card,
+        cursor: "pointer",
+        transition: "transform 0.12s, box-shadow 0.12s",
+      }}
+      onClick={() => navigate(`/admin/chit-plans/${p.id}`)}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,.10)";
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 2px 10px rgba(0,0,0,.05)";
+      }}
+    >
+      // Top accent bar
       <div style={{ position:"absolute", top:0, left:0, right:0, height:"4px", background: sec.accentColor, borderRadius:"14px 14px 0 0" }}/>
-
+ 
       <div style={S.cardHead}>
         <div style={S.cardName}>{p.chitPlanName}</div>
         <div style={{ ...S.cardBadge, background: sec.badgeBg, color: sec.badgeColor, border: `1px solid ${sec.badgeBorder}` }}>
           {p.totalMonths} months
         </div>
       </div>
-
+ 
       <div style={S.divider}/>
       <div style={S.row}><span style={S.lbl}>Monthly Payment</span><span style={{ ...S.valGreen, color: sec.valColor }}>{rupee(p.monthlyPay)}</span></div>
       <div style={S.row}><span style={S.lbl}>Total Amount</span><span style={S.val}>{rupee(p.totalAmount)}</span></div>
@@ -370,11 +387,11 @@ export default function AdminDashboard() {
       <div style={S.divider}/>
       <div style={S.row}><span style={S.lbl}>Administrator</span><span style={S.val}>{p.adminName}</span></div>
       <div style={S.row}><span style={S.lbl}>Contact</span><span style={S.val}>{p.adminContact}</span></div>
-
+ 
       <div style={S.cardActions}>
-        <button style={S.btnAddPeople} onClick={() => openMembersModal(p)}>👥 Members</button>
-        <button style={S.btnEdit} onClick={() => openEditModal(p)}>✏️ Edit</button>
-        <button style={S.btnDelete} onClick={() => setDeleteModal({id:p.id,name:p.chitPlanName})}>🗑 Delete</button>
+        <button style={S.btnAddPeople} onClick={e => { e.stopPropagation(); openMembersModal(p); }}>👥 Members</button>
+        <button style={S.btnEdit} onClick={e => { e.stopPropagation(); openEditModal(p); }}>✏️ Edit</button>
+        <button style={S.btnDelete} onClick={e => { e.stopPropagation(); setDeleteModal({id:p.id,name:p.chitPlanName}); }}>🗑 Delete</button>
       </div>
     </div>
   );

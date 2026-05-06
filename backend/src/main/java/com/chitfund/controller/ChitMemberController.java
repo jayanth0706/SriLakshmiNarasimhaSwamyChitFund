@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/chit-plans/{planId}/members")
@@ -78,4 +79,41 @@ public class ChitMemberController {
         chitMemberRepository.deleteById(memberId);
         return ResponseEntity.ok("Member removed successfully.");
     }
+
+    // ── PUT /admin/chit-plans/{planId}/members/{memberId} ─────────────────
+    // Updates memberName, memberEmail, winningMonth
+    @PutMapping("/{memberId}")
+    public ResponseEntity<String> updateMember(
+            @PathVariable Long planId,
+            @PathVariable Long memberId,
+            @RequestBody Map<String, String> body) {
+    
+        if (!chitPlanRepository.existsById(planId))
+            return ResponseEntity.notFound().build();
+    
+        return chitMemberRepository.findById(memberId).map(member -> {
+            String name = body.get("memberName");
+            String email = body.get("memberEmail");
+            String winningMonth = body.get("winningMonth");
+    
+            if (name != null && !name.isBlank()) {
+                if (!name.matches("[a-zA-Z ]+"))
+                    return ResponseEntity.badRequest().body("Member name must contain letters only.");
+                if (name.length() > 60)
+                    return ResponseEntity.badRequest().body("Member name must be 60 characters or less.");
+                member.setMemberName(name);
+            }
+            if (email != null && !email.isBlank()) {
+                if (!email.matches("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))
+                    return ResponseEntity.badRequest().body("Invalid email format.");
+                member.setMemberEmail(email);
+            }
+            if (winningMonth != null)
+                member.setWinningMonth(winningMonth);  // add this field to ChitMember entity
+    
+            chitMemberRepository.save(member);
+            return ResponseEntity.ok("Member updated successfully.");
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
 }
