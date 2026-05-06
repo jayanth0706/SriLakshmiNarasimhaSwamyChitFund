@@ -38,7 +38,14 @@ public class ChitMemberController {
         if (!chitPlanRepository.existsById(planId))
             return ResponseEntity.badRequest().body("Chit plan not found.");
 
-        // Validation
+        // ── Member limit check ──
+        int totalMonths = chitPlanRepository.findById(planId).get().getTotalMonths();
+        long currentCount = chitMemberRepository.findByChitPlanId(planId).size();
+        if (currentCount >= totalMonths)
+            return ResponseEntity.badRequest()
+                .body("Member limit reached. This plan allows max " + totalMonths + " members.");
+
+        // ── Validation ──
         if (member.getMemberName() == null || member.getMemberName().isBlank())
             return ResponseEntity.badRequest().body("Member name is required.");
         if (!member.getMemberName().matches("[a-zA-Z ]+"))
@@ -47,10 +54,12 @@ public class ChitMemberController {
             return ResponseEntity.badRequest().body("Member name must be 60 characters or less.");
         if (member.getMemberContact() == null || !member.getMemberContact().matches("\\d{10}"))
             return ResponseEntity.badRequest().body("Member contact must be exactly 10 digits.");
+        if (member.getMemberEmail() != null && !member.getMemberEmail().isBlank()) {
+            if (!member.getMemberEmail().matches("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))
+                return ResponseEntity.badRequest().body("Invalid email format.");
+        }
 
-        // Link member to the plan
         member.setChitPlanId(planId);
-
         chitMemberRepository.save(member);
         return ResponseEntity.ok("Member added successfully.");
     }

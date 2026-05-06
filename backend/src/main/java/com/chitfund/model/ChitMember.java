@@ -20,6 +20,9 @@ public class ChitMember {
     @Column(name = "member_contact", nullable = false, length = 10)
     private String memberContact;
 
+    @Column(name = "member_email", length = 100)
+    private String memberEmail;
+
     @Column(name = "member_address", length = 200)
     private String memberAddress;
 
@@ -35,6 +38,9 @@ public class ChitMember {
 
     public String getMemberContact()                     { return memberContact; }
     public void   setMemberContact(String memberContact) { this.memberContact = memberContact; }
+
+    public String getMemberEmail()                   { return memberEmail; }
+    public void   setMemberEmail(String memberEmail) { this.memberEmail = memberEmail; }
 
     public String getMemberAddress()                     { return memberAddress; }
     public void   setMemberAddress(String memberAddress) { this.memberAddress = memberAddress; }

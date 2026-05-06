@@ -104,7 +104,7 @@ const classifyPlan = (plan) => {
 };
 
 const BLANK_PLAN   = { chitPlanName:"", totalAmount:"", monthlyPay:"", totalMonths:"", startDate:"", endDate:"", adminName:"", adminContact:"" };
-const BLANK_MEMBER = { memberName:"", memberContact:"", memberAddress:"" };
+const BLANK_MEMBER = { memberName:"", memberContact:"", memberAddress:"", memberEmail:"" };
 
 function validatePlan(f) {
   const e = {};
@@ -134,6 +134,9 @@ function validateMember(f) {
   else if (f.memberName.length > 60)              e.memberName    = "Max 60 chars.";
   if (!f.memberContact)                           e.memberContact = "Required.";
   else if (!/^\d{10}$/.test(f.memberContact))    e.memberContact = "Exactly 10 digits.";
+  if (f.memberEmail && f.memberEmail.trim())
+    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(f.memberEmail))
+      e.memberEmail = "Invalid email format.";
   return e;
 }
 
@@ -524,17 +527,31 @@ export default function AdminDashboard() {
               <button style={S.mClose} onClick={()=>setMembersModal(null)}>✕</button>
             </div>
             <div style={S.mBody}>
-              <div style={{background:G_LIGHT,border:`1px solid ${G_BORDER}`,borderRadius:"10px",padding:"16px"}}>
+              {/* Member count indicator */}
+              <div style={{fontSize:"12px", color: members.length >= membersModal.totalMonths ? RED : G, fontWeight:600, marginBottom:"4px"}}>
+                {members.length} / {membersModal.totalMonths} members enrolled
+              </div>
+
+              <div style={{background:G_LIGHT,border:`1px solid ${G_BORDER}`,borderRadius:"10px",padding:"16px", opacity: members.length >= membersModal.totalMonths ? 0.5 : 1}}>
                 <div style={{fontWeight:700,fontSize:"13px",color:G,marginBottom:"12px"}}>➕ Add New Member</div>
                 <div style={S.row2}>
                   <Field name="memberName"    label="Full Name *"    placeholder="Letters only"    value={memberForm.memberName}    onChange={handleMemberChange} errors={memberErrs}/>
-                  <Field name="memberContact" label="Contact *"       placeholder="10-digit number" value={memberForm.memberContact} onChange={handleMemberChange} errors={memberErrs}/>
+                  <Field name="memberContact" label="Contact *"      placeholder="10-digit number" value={memberForm.memberContact} onChange={handleMemberChange} errors={memberErrs}/>
+                </div>
+                <div style={{marginTop:"12px"}}>
+                  <Field name="memberEmail"   label="Email (optional)" placeholder="example@email.com" value={memberForm.memberEmail} onChange={handleMemberChange} errors={memberErrs}/>
                 </div>
                 <div style={{marginTop:"12px"}}>
                   <Field name="memberAddress" label="Address (optional)" placeholder="Street, City" value={memberForm.memberAddress} onChange={handleMemberChange} errors={memberErrs}/>
                 </div>
                 <div style={{display:"flex",justifyContent:"flex-end",marginTop:"14px"}}>
-                  <button style={{...S.btnGreen,opacity:memberSaving?.7:1}} onClick={submitMember} disabled={memberSaving}>{memberSaving?"Adding…":"+ Add Member"}</button>
+                  <button 
+                    style={{...S.btnGreen, opacity: memberSaving || members.length >= membersModal.totalMonths ? 0.5 : 1}} 
+                    onClick={submitMember} 
+                    disabled={memberSaving || members.length >= membersModal.totalMonths}
+                  >
+                    {memberSaving ? "Adding…" : members.length >= membersModal.totalMonths ? "Limit Reached" : "+ Add Member"}
+                  </button>
                 </div>
               </div>
 
