@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
-import ChitPlanDetail from "./ChitPlanDetail";
+import ChitPlanDetail from "./components/ChitPlanDetail";
 import ProtectedRoute from "./components/ProtectedRoute"; 
 
 function App() {
