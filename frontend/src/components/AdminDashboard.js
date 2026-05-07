@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-const fontLink = document.createElement("link");
-fontLink.rel = "stylesheet";
-fontLink.href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap";
-document.head.appendChild(fontLink);
+// ✅ Font loaded safely inside useEffect — no top-level DOM access
 
 const G = "#16a34a";
 const G_LIGHT = "#f0fdf4";
@@ -30,16 +27,12 @@ const S = {
   body: { flex: 1, padding: "36px 40px 120px" },
   pageHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" },
   pageTitle: { fontWeight: 800, fontSize: "22px", color: "#0a0a0a" },
-  cardClickable: { cursor: "pointer", transition: "transform 0.12s, box-shadow 0.12s" },
-
-  // Section styles
   section: { marginBottom: "40px" },
   sectionHeader: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "18px" },
   sectionTitle: { fontWeight: 700, fontSize: "16px", color: "#0a0a0a" },
   sectionDot: { width: "10px", height: "10px", borderRadius: "50%", flexShrink: 0 },
   countPill: { borderRadius: "20px", padding: "3px 12px", fontSize: "12px", fontWeight: 600 },
   sectionDivider: { height: "1px", background: "#e5e7eb", marginBottom: "18px" },
-
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: "20px" },
   card: { background: "#fff", borderRadius: "14px", border: "1px solid #e8ebe8", padding: "20px 22px 16px", display: "flex", flexDirection: "column", gap: "11px", boxShadow: "0 2px 10px rgba(0,0,0,.05)", position: "relative", overflow: "hidden" },
   cardHead: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" },
@@ -52,12 +45,10 @@ const S = {
   valGreen: { fontSize: "14px", color: G, fontWeight: 700 },
   valBlue: { fontSize: "14px", color: BLUE, fontWeight: 700 },
   valGray: { fontSize: "14px", color: GRAY, fontWeight: 700 },
-
   cardActions: { display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "4px", flexWrap: "wrap" },
   btnAddPeople: { display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", background: G_LIGHT, color: G, border: `1.5px solid ${G_BORDER}`, borderRadius: "7px", fontFamily: FONT, fontWeight: 600, fontSize: "12px", cursor: "pointer" },
   btnEdit: { display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", background: BLUE_LIGHT, color: BLUE, border: `1.5px solid ${BLUE_BORDER}`, borderRadius: "7px", fontFamily: FONT, fontWeight: 600, fontSize: "12px", cursor: "pointer" },
   btnDelete: { display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", background: "#fff5f5", color: RED, border: "1.5px solid #fecaca", borderRadius: "7px", fontFamily: FONT, fontWeight: 600, fontSize: "12px", cursor: "pointer" },
-
   fab: { position: "fixed", bottom: "34px", right: "40px", display: "flex", alignItems: "center", gap: "8px", padding: "13px 28px", background: G, color: "#fff", border: "none", borderRadius: "8px", fontFamily: FONT, fontWeight: 700, fontSize: "14px", cursor: "pointer", boxShadow: "0 6px 20px rgba(22,163,74,.4)" },
   overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
   modal: { background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "580px", maxHeight: "92vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,.18)", display: "flex", flexDirection: "column" },
@@ -193,6 +184,17 @@ const SECTIONS = [
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
+  // ✅ Fix 1: Font loaded safely inside useEffect
+  useEffect(() => {
+    if (!document.querySelector('link[data-font="outfit"]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap";
+      link.setAttribute("data-font", "outfit");
+      document.head.appendChild(link);
+    }
+  }, []);
+
   const [plans, setPlans]           = useState([]);
   const [loading, setLoading]       = useState(true);
 
@@ -203,7 +205,7 @@ export default function AdminDashboard() {
   const [planSaving, setPlanSaving] = useState(false);
 
   // Edit modal
-  const [editModal, setEditModal]   = useState(null); // holds plan being edited
+  const [editModal, setEditModal]   = useState(null);
   const [editForm, setEditForm]     = useState(BLANK_PLAN);
   const [editErrs, setEditErrs]     = useState({});
   const [editSaving, setEditSaving] = useState(false);
@@ -247,7 +249,7 @@ export default function AdminDashboard() {
     finally { setMembersLoading(false); }
   }, []);
 
-  // ── Create Plan ──
+  // Create Plan
   function openPlanModal() { setPlanForm(BLANK_PLAN); setPlanErrs({}); setPlanModal(true); }
 
   async function submitPlan() {
@@ -267,7 +269,7 @@ export default function AdminDashboard() {
     } finally { setPlanSaving(false); }
   }
 
-  // ── Edit Plan ──
+  // Edit Plan
   function openEditModal(plan) {
     setEditModal(plan);
     setEditForm({
@@ -295,7 +297,7 @@ export default function AdminDashboard() {
         setEditModal(null);
         fetchPlans();
       } else {
-        // Optimistic update if backend PUT not yet implemented
+        // Optimistic update
         setPlans(p => p.map(x => x.id === editModal.id ? { ...x, ...payload } : x));
         showToast("Plan updated (demo mode)!");
         setEditModal(null);
@@ -307,7 +309,7 @@ export default function AdminDashboard() {
     } finally { setEditSaving(false); }
   }
 
-  // ── Delete Plan ──
+  // Delete Plan
   async function confirmDelete() {
     if (!deleteModal) return;
     setDeleting(true);
@@ -319,7 +321,7 @@ export default function AdminDashboard() {
     finally { setDeleting(false); setDeleteModal(null); }
   }
 
-  // ── Members ──
+  // Members
   function openMembersModal(plan) { setMembersModal(plan); setMemberForm(BLANK_MEMBER); setMemberErrs({}); fetchMembers(plan.id); }
 
   async function submitMember() {
@@ -360,7 +362,7 @@ export default function AdminDashboard() {
         cursor: "pointer",
         transition: "transform 0.12s, box-shadow 0.12s",
       }}
-      onClick={() => navigate(`/admin/chit-plans/${p.id}`)}
+      onClick={() => navigate(`/chit-plan/${p.id}`)}  // ✅ Fix 3: matches App.js route
       onMouseEnter={e => {
         e.currentTarget.style.transform = "translateY(-2px)";
         e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,.10)";
@@ -370,16 +372,16 @@ export default function AdminDashboard() {
         e.currentTarget.style.boxShadow = "0 2px 10px rgba(0,0,0,.05)";
       }}
     >
-      // Top accent bar
+      {/* Top accent bar */}
       <div style={{ position:"absolute", top:0, left:0, right:0, height:"4px", background: sec.accentColor, borderRadius:"14px 14px 0 0" }}/>
- 
+
       <div style={S.cardHead}>
         <div style={S.cardName}>{p.chitPlanName}</div>
         <div style={{ ...S.cardBadge, background: sec.badgeBg, color: sec.badgeColor, border: `1px solid ${sec.badgeBorder}` }}>
           {p.totalMonths} months
         </div>
       </div>
- 
+
       <div style={S.divider}/>
       <div style={S.row}><span style={S.lbl}>Monthly Payment</span><span style={{ ...S.valGreen, color: sec.valColor }}>{rupee(p.monthlyPay)}</span></div>
       <div style={S.row}><span style={S.lbl}>Total Amount</span><span style={S.val}>{rupee(p.totalAmount)}</span></div>
@@ -387,7 +389,7 @@ export default function AdminDashboard() {
       <div style={S.divider}/>
       <div style={S.row}><span style={S.lbl}>Administrator</span><span style={S.val}>{p.adminName}</span></div>
       <div style={S.row}><span style={S.lbl}>Contact</span><span style={S.val}>{p.adminContact}</span></div>
- 
+
       <div style={S.cardActions}>
         <button style={S.btnAddPeople} onClick={e => { e.stopPropagation(); openMembersModal(p); }}>👥 Members</button>
         <button style={S.btnEdit} onClick={e => { e.stopPropagation(); openEditModal(p); }}>✏️ Edit</button>
@@ -441,7 +443,7 @@ export default function AdminDashboard() {
       {/* FAB */}
       <button style={S.fab} onClick={openPlanModal}>+ New Chit Plan</button>
 
-      {/* ── Modal: Create Plan ── */}
+      {/* Modal: Create Plan */}
       {planModal && (
         <div style={S.overlay} onClick={e=>e.target===e.currentTarget&&setPlanModal(false)}>
           <div style={S.modal}>
@@ -471,13 +473,13 @@ export default function AdminDashboard() {
             </div>
             <div style={S.mFooter}>
               <button style={S.btnOutline} onClick={()=>setPlanModal(false)} disabled={planSaving}>Cancel</button>
-              <button style={{...S.btnGreen,opacity:planSaving?.7:1}} onClick={submitPlan} disabled={planSaving}>{planSaving?"Saving…":"Create Plan"}</button>
+              <button style={{...S.btnGreen, opacity:planSaving ? 0.7 : 1}} onClick={submitPlan} disabled={planSaving}>{planSaving?"Saving…":"Create Plan"}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Modal: Edit Plan ── */}
+      {/* Modal: Edit Plan */}
       {editModal && (
         <div style={S.overlay} onClick={e=>e.target===e.currentTarget&&setEditModal(null)}>
           <div style={S.modal}>
@@ -507,13 +509,13 @@ export default function AdminDashboard() {
             </div>
             <div style={S.mFooter}>
               <button style={S.btnOutline} onClick={()=>setEditModal(null)} disabled={editSaving}>Cancel</button>
-              <button style={{...S.btnBlue,opacity:editSaving?.7:1}} onClick={submitEdit} disabled={editSaving}>{editSaving?"Saving…":"Save Changes"}</button>
+              <button style={{...S.btnBlue, opacity:editSaving ? 0.7 : 1}} onClick={submitEdit} disabled={editSaving}>{editSaving?"Saving…":"Save Changes"}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Modal: Delete Confirm ── */}
+      {/* Modal: Delete Confirm */}
       {deleteModal && (
         <div style={S.overlay} onClick={e=>e.target===e.currentTarget&&setDeleteModal(null)}>
           <div style={{...S.modal,maxWidth:"400px"}}>
@@ -525,14 +527,14 @@ export default function AdminDashboard() {
               </div>
               <div style={S.confirmActions}>
                 <button style={S.btnOutline} onClick={()=>setDeleteModal(null)} disabled={deleting}>Cancel</button>
-                <button style={{...S.btnRed,opacity:deleting?.7:1}} onClick={confirmDelete} disabled={deleting}>{deleting?"Deleting…":"Yes, Delete"}</button>
+                <button style={{...S.btnRed, opacity:deleting ? 0.7 : 1}} onClick={confirmDelete} disabled={deleting}>{deleting?"Deleting…":"Yes, Delete"}</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Modal: Members ── */}
+      {/* Modal: Members */}
       {membersModal && (
         <div style={S.overlay} onClick={e=>e.target===e.currentTarget&&setMembersModal(null)}>
           <div style={S.modal}>
@@ -562,9 +564,9 @@ export default function AdminDashboard() {
                   <Field name="memberAddress" label="Address (optional)" placeholder="Street, City" value={memberForm.memberAddress} onChange={handleMemberChange} errors={memberErrs}/>
                 </div>
                 <div style={{display:"flex",justifyContent:"flex-end",marginTop:"14px"}}>
-                  <button 
-                    style={{...S.btnGreen, opacity: memberSaving || members.length >= membersModal.totalMonths ? 0.5 : 1}} 
-                    onClick={submitMember} 
+                  <button
+                    style={{...S.btnGreen, opacity: memberSaving || members.length >= membersModal.totalMonths ? 0.5 : 1}}
+                    onClick={submitMember}
                     disabled={memberSaving || members.length >= membersModal.totalMonths}
                   >
                     {memberSaving ? "Adding…" : members.length >= membersModal.totalMonths ? "Limit Reached" : "+ Add Member"}
