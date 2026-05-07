@@ -1,18 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const fontLink = document.createElement("link");
-fontLink.rel = "stylesheet";
-fontLink.href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap";
-document.head.appendChild(fontLink);
+// ── Removed top-level document.createElement (caused build failure) ──
+// Font is now loaded safely inside useEffect
 
 const G = "#16a34a";
 const G_LIGHT = "#f0fdf4";
 const G_BORDER = "#bbf7d0";
 const RED = "#ef4444";
-const BLUE = "#2563eb";
-const BLUE_LIGHT = "#eff6ff";
-const BLUE_BORDER = "#bfdbfe";
 const GRAY = "#6b7280";
 const FONT = "'Outfit', sans-serif";
 const BASE = `${process.env.REACT_APP_API_URL}/admin`;
@@ -40,10 +35,7 @@ const ordinal = n => {
 };
 
 const S = {
-  // ── Layout ──
   root: { fontFamily: FONT, minHeight: "100vh", background: "#f4f6f4", display: "flex", flexDirection: "column" },
-
-  // ── Navbar — identical to AdminDashboard ──
   navbar: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
     padding: "0 40px", height: "66px", background: "#fff",
@@ -57,10 +49,7 @@ const S = {
   btnOutline: { padding: "8px 20px", border: `1.5px solid ${G}`, borderRadius: "7px", background: "transparent", fontFamily: FONT, fontWeight: 600, fontSize: "13px", cursor: "pointer", color: "#111" },
   btnGreen:  { padding: "8px 20px", border: "none", borderRadius: "7px", background: G, fontFamily: FONT, color: "#fff", fontWeight: 600, fontSize: "13px", cursor: "pointer" },
   backBtn:   { display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", border: "1.5px solid #e5e7eb", borderRadius: "7px", background: "#fff", fontFamily: FONT, fontSize: "13px", fontWeight: 600, cursor: "pointer", color: "#374151" },
-
   body: { flex: 1, padding: "36px 40px 80px" },
-
-  // ── Info card ──
   infoCard: {
     background: "#fff", borderRadius: "14px", border: "1px solid #e8ebe8",
     padding: "22px 28px", marginBottom: "24px",
@@ -78,8 +67,6 @@ const S = {
   statVal:      { fontSize: "15px", fontWeight: 700, color: "#0a0a0a" },
   statValGreen: { fontSize: "15px", fontWeight: 700, color: G },
   badge: { background: G_LIGHT, color: G, border: `1px solid ${G_BORDER}`, borderRadius: "20px", padding: "4px 14px", fontSize: "12px", fontWeight: 700 },
-
-  // ── Save bar ──
   saveBar: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
     background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "10px",
@@ -89,8 +76,6 @@ const S = {
   saveActions: { display: "flex", gap: "10px" },
   btnSave:    { padding: "8px 22px", border: "none", borderRadius: "7px", background: G, color: "#fff", fontFamily: FONT, fontWeight: 700, fontSize: "13px", cursor: "pointer" },
   btnDiscard: { padding: "8px 18px", border: "1.5px solid #e5e7eb", borderRadius: "7px", background: "#fff", fontFamily: FONT, fontWeight: 600, fontSize: "13px", cursor: "pointer", color: "#374151" },
-
-  // ── Spreadsheet ──
   sheetWrap: {
     background: "#fff", borderRadius: "14px", border: "1px solid #e0e3e0",
     overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,.05)"
@@ -103,8 +88,6 @@ const S = {
   },
   tableScroll: { overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 340px)" },
   table: { borderCollapse: "collapse", tableLayout: "fixed", fontSize: "12.5px", fontFamily: FONT },
-
-  // Headers
   thRowNum: {
     background: "#f0f2f0", borderRight: "1px solid #e0e3e0", borderBottom: "2px solid #d1d5d1",
     padding: "10px 8px", fontWeight: 700, fontSize: "11px", color: GRAY,
@@ -125,8 +108,6 @@ const S = {
     padding: "10px 10px", fontWeight: 700, fontSize: "11.5px", color: "#374151",
     textAlign: "center", whiteSpace: "nowrap", position: "sticky", top: 0, zIndex: 10, lineHeight: 1.35
   },
-
-  // Cells
   tdRowNum: {
     borderRight: "1px solid #e0e3e0", borderBottom: "1px solid #e8ebe8",
     padding: "0 8px", textAlign: "center", fontSize: "11px", color: "#9ca3af",
@@ -145,8 +126,6 @@ const S = {
     borderRight: "1px solid #e8ebe8", borderBottom: "1px solid #e8ebe8",
     padding: 0, verticalAlign: "middle", background: "#fff"
   },
-
-  // Inputs inside cells
   cellInput: {
     width: "100%", height: "36px", border: "none", outline: "none",
     fontFamily: FONT, fontSize: "12.5px", color: "#111", fontWeight: 500,
@@ -158,7 +137,6 @@ const S = {
     fontFamily: FONT, fontSize: "12px", color: "#374151", fontWeight: 500,
     background: "transparent", padding: "0 8px", boxSizing: "border-box", textAlign: "center"
   },
-
   toast: {
     position: "fixed", bottom: "100px", right: "40px",
     padding: "12px 20px", borderRadius: "8px", fontSize: "13px",
@@ -172,6 +150,17 @@ const S = {
 export default function ChitPlanDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // ✅ Font loaded safely inside useEffect — no more top-level DOM access
+  useEffect(() => {
+    if (!document.querySelector('link[data-font="outfit"]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap";
+      link.setAttribute("data-font", "outfit");
+      document.head.appendChild(link);
+    }
+  }, []);
 
   const [plan, setPlan]       = useState(null);
   const [members, setMembers] = useState([]);
@@ -264,7 +253,6 @@ export default function ChitPlanDetail() {
   return (
     <div style={S.root}>
 
-      {/* ── Navbar — same as AdminDashboard ── */}
       <nav style={S.navbar}>
         <div style={S.navLeft}>
           <button style={S.backBtn} onClick={() => navigate("/dashboard")}>← Back</button>
@@ -276,16 +264,13 @@ export default function ChitPlanDetail() {
         </div>
       </nav>
 
-      {/* ── Body ── */}
       <div style={S.body}>
 
-        {/* Page title row */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"28px" }}>
           <span style={{ fontWeight:800, fontSize:"22px", color:"#0a0a0a" }}>Plan Details</span>
           <span style={{ fontSize:"13px", color:GRAY }}>Plan ID: <b style={{color:"#111"}}>#{id}</b></span>
         </div>
 
-        {/* ── Info Card ── */}
         <div style={S.infoCard}>
           <div style={S.infoAccent}/>
           <div style={S.infoLeft}>
@@ -309,7 +294,6 @@ export default function ChitPlanDetail() {
           </div>
         </div>
 
-        {/* ── Save Bar ── */}
         {dirty && (
           <div style={S.saveBar}>
             <span style={S.saveTxt}>⚠️ You have unsaved changes</span>
@@ -322,7 +306,6 @@ export default function ChitPlanDetail() {
           </div>
         )}
 
-        {/* ── Spreadsheet ── */}
         <div style={S.sheetWrap}>
           <div style={S.titleRow}>📋 {plan.chitPlanName}</div>
           <div style={S.tableScroll}>
@@ -356,28 +339,24 @@ export default function ChitPlanDetail() {
                     </td>
                   </tr>
                 ) : rows.map((row, rowIdx) => {
-                  const bg     = rowIdx % 2 === 0 ? "#fff"    : "#fafcfa";
+                  const bg       = rowIdx % 2 === 0 ? "#fff"    : "#fafcfa";
                   const bgFreeze = rowIdx % 2 === 0 ? "#fafcfa" : "#f5f8f5";
                   return (
                     <tr key={row.memberId} style={{ background: bg }}>
                       <td style={S.tdRowNum}>{rowIdx + 1}</td>
 
-                      {/* Name */}
                       <td style={{ ...S.tdFrozen1, left:`${LEFT_NAME}px`,  width:COL_NAME,  background:bgFreeze }}>
-                        <EditableCell value={row.memberName}   onChange={v => handleNameChange(rowIdx, v)}  placeholder="Member name"       isFocused={focusedCell?.row===rowIdx && focusedCell?.col==="name"}  onFocus={() => setFocusedCell({row:rowIdx,col:"name"})}  onBlur={() => setFocusedCell(null)}/>
+                        <EditableCell value={row.memberName}  onChange={v => handleNameChange(rowIdx, v)}  placeholder="Member name"       isFocused={focusedCell?.row===rowIdx && focusedCell?.col==="name"}  onFocus={() => setFocusedCell({row:rowIdx,col:"name"})}  onBlur={() => setFocusedCell(null)}/>
                       </td>
 
-                      {/* Email */}
                       <td style={{ ...S.tdFrozen1, left:`${LEFT_EMAIL}px`, width:COL_EMAIL, background:bgFreeze }}>
-                        <EditableCell value={row.memberEmail}  onChange={v => handleEmailChange(rowIdx, v)} placeholder="email@example.com" isFocused={focusedCell?.row===rowIdx && focusedCell?.col==="email"} onFocus={() => setFocusedCell({row:rowIdx,col:"email"})} onBlur={() => setFocusedCell(null)}/>
+                        <EditableCell value={row.memberEmail} onChange={v => handleEmailChange(rowIdx, v)} placeholder="email@example.com" isFocused={focusedCell?.row===rowIdx && focusedCell?.col==="email"} onFocus={() => setFocusedCell({row:rowIdx,col:"email"})} onBlur={() => setFocusedCell(null)}/>
                       </td>
 
-                      {/* Winning month */}
                       <td style={{ ...S.tdFrozen3, left:`${LEFT_WIN}px`, width:COL_WIN, background:bgFreeze }}>
                         <WinningMonthCell value={row.winningMonth} onChange={v => handleWinningMonthChange(rowIdx, v)} plan={plan} isFocused={focusedCell?.row===rowIdx && focusedCell?.col==="win"} onFocus={() => setFocusedCell({row:rowIdx,col:"win"})} onBlur={() => setFocusedCell(null)}/>
                       </td>
 
-                      {/* Month payment cells */}
                       {monthCols.map(mIdx => (
                         <td key={mIdx} style={S.td}>
                           <MonthCell value={row.months[mIdx]} onChange={v => handleMonthCellChange(rowIdx, mIdx, v)} isFocused={focusedCell?.row===rowIdx && focusedCell?.col===mIdx} onFocus={() => setFocusedCell({row:rowIdx,col:mIdx})} onBlur={() => setFocusedCell(null)}/>
@@ -446,10 +425,10 @@ function MonthCell({ value, onChange, isFocused, onFocus, onBlur }) {
     <input
       style={{
         ...S.monthInput,
-        background:  isFocused ? "#fffbeb" : isPaid ? G_LIGHT : "transparent",
-        color:       isPaid ? G : "#374151",
-        fontWeight:  isPaid ? 700 : 400,
-        outline:     isFocused ? `2px solid #f59e0b` : "none",
+        background:    isFocused ? "#fffbeb" : isPaid ? G_LIGHT : "transparent",
+        color:         isPaid ? G : "#374151",
+        fontWeight:    isPaid ? 700 : 400,
+        outline:       isFocused ? `2px solid #f59e0b` : "none",
         outlineOffset: "-2px",
       }}
       value={local}
