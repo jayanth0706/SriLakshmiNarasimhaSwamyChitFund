@@ -223,9 +223,9 @@ function AdminLogin() {
 
               {/* ── Nav links below button ── */}
               <div className="nav-links">
-                <button className="nav-link-btn" onClick={() => navigate("/userlogin")}>User Login</button>
+                <button className="nav-link-btn" onClick={() => navigate("/user-login")}>User Login</button>
                 <span className="nav-link-sep">|</span>
-                <button className="nav-link-btn" onClick={() => navigate("/usersignup")}>Sign Up</button>
+                <button className="nav-link-btn" onClick={() => navigate("/user-signup")}>Sign Up</button>
               </div>
 
             </div>
