@@ -20,7 +20,7 @@ public class UserController {
     @Autowired
     private UserDataRepository userDataRepository;
 
-    @Autowired(required = false)
+    @Autowired
     private JavaMailSender mailSender;
 
     // Base URL used in the verification email link (set in application.properties)
