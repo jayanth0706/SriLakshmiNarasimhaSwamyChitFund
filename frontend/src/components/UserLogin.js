@@ -208,7 +208,7 @@ function UserLogin() {
               <div className="nav-links">
                 <button className="nav-link-btn" onClick={() => navigate("/login")}>Admin Login</button>
                 <span className="nav-link-sep">|</span>
-                <button className="nav-link-btn" onClick={() => navigate("/usersignup")}>Sign Up</button>
+                <button className="nav-link-btn" onClick={() => navigate("/user-signup")}>Sign Up</button>
                 <span className="nav-link-sep">|</span>
                 <button className="nav-link-btn" onClick={() => navigate("/forgotpassword")}>Forgot Password</button>
               </div>

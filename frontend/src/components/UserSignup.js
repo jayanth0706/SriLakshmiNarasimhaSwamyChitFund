@@ -226,7 +226,7 @@ function UserSignup() {
                 <div className="success-box">
                   ✅ {successMsg}
                   <br/>
-                  <button onClick={() => navigate("/userlogin")}>Go to Login</button>
+                  <button onClick={() => navigate("/user-login")}>Go to Login</button>
                 </div>
               ) : (
                 <>
@@ -327,7 +327,7 @@ function UserSignup() {
                   <div className="nav-links">
                     <button className="nav-link-btn" onClick={() => navigate("/login")}>Admin Login</button>
                     <span className="nav-link-sep">|</span>
-                    <button className="nav-link-btn" onClick={() => navigate("/userlogin")}>User Login</button>
+                    <button className="nav-link-btn" onClick={() => navigate("/user-login")}>User Login</button>
                   </div>
                 </>
               )}
