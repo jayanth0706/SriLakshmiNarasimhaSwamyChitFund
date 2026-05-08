@@ -1,60 +1,45 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function AdminLogin() {
+function UserLogin() {
   const navigate = useNavigate();
-  const [loggingIn, setLoggingIn] = useState(false);
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email or username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
-    if (!email) return "Email is required";
-    if ((email.match(/@/g) || []).length !== 1) return "Only one @ allowed";
-    if (!emailRegex.test(email)) return "Invalid email format";
-    return null;
-  };
-
-  const validatePassword = (password) => {
-    if (!password) return "Password is required";
-    if (password.length < 6 || password.length > 12)
-      return "Password must be 6–12 characters";
-    return null;
-  };
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const handleLogin = async () => {
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-    if (emailError) return alert(emailError);
-    if (passwordError) return alert(passwordError);
+    if (!identifier.trim()) return alert("Please enter your email or username.");
+    if (!password) return alert("Password is required.");
+    if (password.length < 6 || password.length > 12)
+      return alert("Password must be 6–12 characters.");
+
     setLoggingIn(true);
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/admin/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier: identifier.trim(), password }),
+      });
       const data = await response.text();
       if (response.ok) {
-        sessionStorage.setItem("isLoggedIn", "true");
-        navigate("/dashboard");
+        sessionStorage.setItem("isUserLoggedIn", "true");
+        navigate("/userdashboard");
       } else {
-        alert(data);
+        alert(data || "Invalid credentials. Please try again.");
       }
+    } catch {
+      alert("Unable to connect to server. Please try again later.");
     } finally {
       setLoggingIn(false);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && email && password) handleLogin();
+    if (e.key === "Enter" && identifier && password) handleLogin();
   };
 
-  const isFormValid = email && password;
+  const isFormValid = identifier.trim() && password;
 
   const EyeOpen = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -129,10 +114,7 @@ function AdminLogin() {
           outline: none; background: #fff; color: #333;
           transition: border 0.2s, box-shadow 0.2s;
         }
-        .login-input:focus {
-          border-color: green;
-          box-shadow: 0 0 0 3px rgba(0,128,0,0.12);
-        }
+        .login-input:focus { border-color: green; box-shadow: 0 0 0 3px rgba(0,128,0,0.12); }
         .eye-btn {
           position: absolute; right: 12px; top: 50%;
           transform: translateY(-50%);
@@ -156,15 +138,10 @@ function AdminLogin() {
         .nav-link-btn {
           background: none; border: none; cursor: pointer;
           font-size: 13px; font-weight: 600; color: green;
-          padding: 4px 8px; border-radius: 4px;
-          text-decoration: none;
-          transition: background 0.15s;
+          padding: 4px 8px; border-radius: 4px; transition: background 0.15s;
         }
         .nav-link-btn:hover { background: #f0fdf4; }
-        .nav-link-sep {
-          font-size: 13px; color: #d1d5db;
-          display: flex; align-items: center;
-        }
+        .nav-link-sep { font-size: 13px; color: #d1d5db; display: flex; align-items: center; }
 
         @media (max-width: 600px) {
           html, body, #root { overflow: auto; }
@@ -186,7 +163,7 @@ function AdminLogin() {
       <div className="screen">
         <div className="center-wrapper">
           <h1 className="login-h1">Sri Lakshmi Narasimha Swamy Chit Funds</h1>
-          <h2 className="login-h2">Admin Login</h2>
+          <h2 className="login-h2">User Login</h2>
 
           <div className="login-split">
             <div className="login-image-div">
@@ -194,16 +171,22 @@ function AdminLogin() {
             </div>
 
             <div className="login-form-div">
+
+              {/* Input 1: Email or Username */}
               <div className="input-wrapper">
-                <input className="login-input" type="email" placeholder="Enter Email"
-                  onChange={(e) => setEmail(e.target.value)} onKeyDown={handleKeyPress}/>
+                <input className="login-input" type="text"
+                  placeholder="Enter Email or Username"
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  onKeyDown={handleKeyPress}/>
               </div>
 
+              {/* Input 2: Password */}
               <div className="input-wrapper">
                 <input className="login-input"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter Password"
-                  onChange={(e) => setPassword(e.target.value)} onKeyDown={handleKeyPress}/>
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyPress}/>
                 <button className="eye-btn" onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1} type="button">
                   {showPassword ? <EyeOff /> : <EyeOpen />}
@@ -221,11 +204,13 @@ function AdminLogin() {
                 </button>
               </div>
 
-              {/* ── Nav links below button ── */}
+              {/* ── Nav links: Admin Login | Sign Up | Forgot Password ── */}
               <div className="nav-links">
-                <button className="nav-link-btn" onClick={() => navigate("/userlogin")}>User Login</button>
+                <button className="nav-link-btn" onClick={() => navigate("/login")}>Admin Login</button>
                 <span className="nav-link-sep">|</span>
                 <button className="nav-link-btn" onClick={() => navigate("/usersignup")}>Sign Up</button>
+                <span className="nav-link-sep">|</span>
+                <button className="nav-link-btn" onClick={() => navigate("/forgotpassword")}>Forgot Password</button>
               </div>
 
             </div>
@@ -236,4 +221,4 @@ function AdminLogin() {
   );
 }
 
-export default AdminLogin;
+export default UserLogin;
