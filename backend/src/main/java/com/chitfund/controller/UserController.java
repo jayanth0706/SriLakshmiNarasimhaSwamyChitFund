@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+
+import com.resend.Resend;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -21,7 +24,8 @@ public class UserController {
     private UserDataRepository userDataRepository;
 
     @Autowired
-    private JavaMailSender mailSender;
+    @Value("${resend.api-key}")
+    private String resendApiKey;
 
     // Base URL used in the verification email link (set in application.properties)
     @Value("${app.base-url:http://localhost:8080}")
