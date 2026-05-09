@@ -144,23 +144,29 @@ public class UserController {
 
     // ── Helper: send verification email ───────────────────────────────────
     private void sendVerificationEmail(String toEmail, String firstName, String token) {
-        if (mailSender == null) return; // skip if mail not configured
         try {
+            Resend resend = new Resend(resendApiKey);
+
             String verifyUrl = baseUrl + "/users/verify?token=" + token;
-            SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setTo(toEmail);
-            msg.setSubject("Verify your Sri Lakshmi Narasimha Swamy Chit Fund account");
-            msg.setText(
-                "Hello " + firstName + ",\n\n" +
-                "Thank you for registering! Please click the link below to verify your email:\n\n" +
-                verifyUrl + "\n\n" +
-                "If you did not create this account, please ignore this email.\n\n" +
-                "— Sri Lakshmi Narasimha Swamy Chit Funds"
-            );
-            mailSender.send(msg);
+
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("onboarding@resend.dev")        // use this until you add your domain
+                .to(toEmail)
+                .subject("Verify your Sri Lakshmi Narasimha Swamy Chit Fund account")
+                .text(
+                    "Hello " + firstName + ",\n\n" +
+                    "Please click the link below to verify your email:\n\n" +
+                    verifyUrl + "\n\n" +
+                    "— Sri Lakshmi Narasimha Swamy Chit Funds"
+                )
+                .build();
+
+            CreateEmailResponse response = resend.emails().send(params);
+            System.out.println("EMAIL SENT, id: " + response.getId());
+
         } catch (Exception e) {
-            // Log but don't fail the signup if email sending fails
-            System.err.println("Warning: Could not send verification email — " + e.getMessage());
+            System.err.println("EMAIL ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
